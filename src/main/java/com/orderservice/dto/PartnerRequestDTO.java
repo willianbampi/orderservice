@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record PartnerResquestDTO(
+public record PartnerRequestDTO(
         @NotBlank String name,
         @NotNull @Min(0) BigDecimal creditLimit
 ) {
