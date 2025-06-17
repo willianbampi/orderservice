@@ -27,15 +27,22 @@ spring:
     username: guest
     password: guest
 
-server:
-  port: 8080
-
 logging:
   level:
     root: INFO
     com.orderservice: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+  appender:
+    gelf:
+      host: udp:graylog
+      port: 12201
+      version: 1.1
+      facility: order-service
+      include-full-mdc: true
+
+server:
+  port: 8080
 
 springdoc:
   api-docs:
@@ -45,3 +52,9 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
   pathsToMatch: /api/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
