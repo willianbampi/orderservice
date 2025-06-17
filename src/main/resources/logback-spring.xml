@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfTcpAppender">
+        <host>graylog</host> <!-- Nome do container no docker-compose -->
+        <port>12201</port>
+        <facility>orderservice</facility>
+        <includeCallerData>true</includeCallerData>
+        <maxRetries>3</maxRetries>
+
+        <staticField>env=dev</staticField>
+        <staticField>application=orderservice</staticField>
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="GELF"/>
+    </root>
+
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.orderservice" level="DEBUG"/>
+
+</configuration>
