@@ -3,6 +3,7 @@ package com.orderservice.service;
 import com.orderservice.dto.PartnerRequestDTO;
 import com.orderservice.dto.PartnerResponseDTO;
 import com.orderservice.entity.Partner;
+import com.orderservice.exception.PartnerNotFoundException;
 import com.orderservice.repository.PartnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class PartnerService {
 
     public PartnerResponseDTO getById(UUID id) {
         Partner partner = partnerRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Partner not Found"));
+                .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
         return toResponseDTO(partner);
     }
 
