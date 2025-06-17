@@ -42,7 +42,7 @@ public class Order {
     private List<OrderItem> items;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", length = 50, nullable = false)
     private OrderStatus status;
 
     public enum OrderStatus {
