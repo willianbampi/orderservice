@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.UUID;
 
 public class EventServiceTest {
@@ -14,7 +15,7 @@ public class EventServiceTest {
     void sendNotification_shouldSendMessage() {
         RabbitTemplate rabbitTemplate = Mockito.mock(RabbitTemplate.class);
         OrderStatusEventPublisher orderStatusEventPublisher = new OrderStatusEventPublisher(rabbitTemplate);
-        OrderStatusEvent orderStatusEvent = new OrderStatusEvent(UUID.randomUUID(), UUID.randomUUID(), new BigDecimal("1000.00"), com.orderservice.entity.Order.OrderStatus.PENDENTE, new LocalDate.of(2025, 10, 10));
+        OrderStatusEvent orderStatusEvent = new OrderStatusEvent(UUID.randomUUID(), UUID.randomUUID(), new BigDecimal("1000.00"), com.orderservice.entity.Order.OrderStatus.PENDENTE, LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
 
         orderStatusEventPublisher.publishStatusChange(orderStatusEvent);
 
