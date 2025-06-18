@@ -12,6 +12,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,7 +41,7 @@ public class PartnerIntegrationTest {
 
     @Test
     void shouldSaveAndGetPartner() {
-        Partner partner = new Partner(UUID.randomUUID(), "Partner A", new BigDecimal("1000.00"));
+        Partner partner = new Partner(UUID.randomUUID(), "Partner A", new BigDecimal("1000.00"), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
 
         Partner savedPartner = partnerRepository.save(partner);
 
