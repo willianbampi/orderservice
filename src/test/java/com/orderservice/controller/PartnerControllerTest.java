@@ -3,7 +3,6 @@ package com.orderservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderservice.dto.PartnerRequestDTO;
 import com.orderservice.dto.PartnerResponseDTO;
-import com.orderservice.entity.Partner;
 import com.orderservice.service.PartnerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

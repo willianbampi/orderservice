@@ -5,6 +5,7 @@ import com.orderservice.dto.OrderItemRequestDTO;
 import com.orderservice.dto.OrderItemResponseDTO;
 import com.orderservice.dto.OrderRequestDTO;
 import com.orderservice.dto.OrderResponseDTO;
+import com.orderservice.entity.Order;
 import com.orderservice.service.OrderService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +47,7 @@ public class OrderControllerTest {
         OrderItemResponseDTO itemResponseDTO = new OrderItemResponseDTO(UUID.randomUUID(),UUID.randomUUID(), 1, new BigDecimal("150.00"));
         List<OrderItemResponseDTO> orderItemResponseList = new ArrayList<OrderItemResponseDTO>();
         orderItemResponseList.add(itemResponseDTO);
-        OrderResponseDTO responseDTO = new OrderResponseDTO(UUID.randomUUID(), UUID.randomUUID(), orderItemResponseList, new BigDecimal("150.00"), new LocalDate.of(2025, 10, 10), new LocalDate.of(2025, 10, 10));
+        OrderResponseDTO responseDTO = new OrderResponseDTO(UUID.randomUUID(), UUID.randomUUID(), orderItemResponseList, new BigDecimal("150.00"), Order.OrderStatus.PENDENTE, LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
 
 
         Mockito.when(orderService.createOrder(Mockito.any())).thenReturn(responseDTO);
@@ -64,7 +66,7 @@ public class OrderControllerTest {
         OrderItemResponseDTO itemResponseDTO = new OrderItemResponseDTO(UUID.randomUUID(),UUID.randomUUID(), 1, new BigDecimal("150.00"));
         List<OrderItemResponseDTO> orderItemResponseList = new ArrayList<OrderItemResponseDTO>();
         orderItemResponseList.add(itemResponseDTO);
-        OrderResponseDTO responseDTO = new OrderResponseDTO(orderId, UUID.randomUUID(), orderItemResponseList, new BigDecimal("150.00"), new LocalDate.of(2025, 10, 10), new LocalDate.of(2025, 10, 10));
+        OrderResponseDTO responseDTO = new OrderResponseDTO(orderId, UUID.randomUUID(), orderItemResponseList, new BigDecimal("150.00"), Order.OrderStatus.PENDENTE, LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
 
         Mockito.when(orderService.getById(orderId)).thenReturn(responseDTO);
 
