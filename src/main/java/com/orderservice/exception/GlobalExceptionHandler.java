@@ -29,8 +29,13 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(NOT_FOUND, ex.getMessage(), request);
     }
 
-    @ExceptionHandler(InsuficientCreditException.class)
-    public ResponseEntity<ApiError> handleInsuficientCreditException(InsuficientCreditException ex, HttpServletRequest request) {
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleAlreadyExistsException(AlreadyExistsException ex, HttpServletRequest request) {
+        return buildResponseEntity(NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientCreditException.class)
+    public ResponseEntity<ApiError> handleInsuficientCreditException(InsufficientCreditException ex, HttpServletRequest request) {
         return buildResponseEntity(BAD_REQUEST, ex.getMessage(), request);
     }
 
@@ -69,16 +74,18 @@ public class GlobalExceptionHandler {
                 .error(status.getReasonPhrase())
                 .message(message)
                 .path(request.getRequestURI())
-                .traceId(getTraceId())
+                //.traceId(getTraceId())
                 .fieldErrors(fieldErrors)
                 .build();
     }
 
+    /**
     private String getTraceId() {
         return java.util.Optional.ofNullable(
                         org.springframework.cloud.sleuth.autoconfig.TraceAutoConfiguration.getCurrentTraceContext())
                 .map(ctx -> ctx.context().map(c -> c.traceId()).orElse("N/A"))
                 .orElse("N/A");
     }
+     */
 
 }
