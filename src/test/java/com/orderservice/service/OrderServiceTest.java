@@ -5,7 +5,7 @@ import com.orderservice.dto.OrderRequestDTO;
 import com.orderservice.dto.OrderResponseDTO;
 import com.orderservice.entity.Order;
 import com.orderservice.entity.Partner;
-import com.orderservice.exception.InsuficientCreditException;
+import com.orderservice.exception.InsufficientCreditException;
 import com.orderservice.repository.OrderRepository;
 import com.orderservice.repository.PartnerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +72,7 @@ public class OrderServiceTest {
 
         when(partnerRepository.findById(partner.getId())).thenReturn(Optional.of(partner));
 
-        assertThrows(InsuficientCreditException.class, () -> orderService.createOrder(orderDTO));
+        assertThrows(InsufficientCreditException.class, () -> orderService.createOrder(orderDTO));
         verify(orderRepository, never()).save(any());
     }
 

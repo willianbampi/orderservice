@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,7 +29,7 @@ public class PartnerServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        Partner partner = new Partner(UUID.randomUUID(), "Partner A", new BigDecimal("1000.00"));
+        Partner partner = new Partner(UUID.randomUUID(), "Partner A", new BigDecimal("1000.00"), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(), LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
     }
 
     @Test
