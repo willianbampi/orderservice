@@ -7,30 +7,43 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/partners")
 @RequiredArgsConstructor
 @Tag(name = "Partners", description = "Partners Management")
-public class PartnerController {
+public class PartnerController implements GenericController {
 
     private final PartnerService partnerService;
 
     @Operation(summary = "Create a new partner")
     @PostMapping
-    public ResponseEntity<PartnerResponseDTO> create(@Valid @RequestBody PartnerRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.create(dto));
+    public ResponseEntity<Void> create(@Valid @RequestBody PartnerRequestDTO dto) {
+        log.info("PARTNERCONTROLLER - create method with dto: {}", dto);
+        PartnerResponseDTO partnerResponseDTO = partnerService.create(dto);
+        URI uri = generateHeaderLocation(partnerResponseDTO.id());
+        return ResponseEntity.created(uri).build();
     }
 
     @Operation(summary = "Get a partner by id")
     @GetMapping("/{id}")
     public ResponseEntity<PartnerResponseDTO> getById(@PathVariable UUID id) {
+        log.info("PARTNERCONTROLLER - getById method with id: {}", id);
         return ResponseEntity.ok(partnerService.getById(id));
+    }
+
+    @Operation(summary = "Update a partner")
+    @PostMapping("/{id}")
+    public ResponseEntity<PartnerResponseDTO> update(@PathVariable UUID id, @Valid @RequestBody PartnerRequestDTO dto) {
+        log.info("PARTNERCONTROLLER - update method with id: {} and with dto: {}", id, dto);
+        return ResponseEntity.ok(partnerService.update(id, dto));
     }
 
 }
