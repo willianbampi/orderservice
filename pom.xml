@@ -14,6 +14,7 @@
 	<groupId>com.orderservice</groupId>
 	<artifactId>orderservice</artifactId>
 	<version>1.0.0</version>
+	<packaging>jar</packaging>
 	<name>orderservice</name>
 	<description>Microserviço de gestão de pedidos B2B</description>
 
@@ -47,6 +48,11 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+			<version>10.15.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
 		</dependency>
 
 		<!-- RabbitMQ -->
@@ -75,22 +81,22 @@
 			<version>2.5.0</version>
 		</dependency>
 
-		<!-- Logback + Graylog (GELF) -->
-		<dependency>
-			<groupId>de.siegmar</groupId>
-			<artifactId>logback-gelf</artifactId>
-			<version>4.0.0</version>
-		</dependency>
+<!--		&lt;!&ndash; Logback + Graylog (GELF) &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>de.siegmar</groupId>-->
+<!--			<artifactId>logback-gelf</artifactId>-->
+<!--			<version>6.1.0</version>-->
+<!--		</dependency>-->
 
-		<!-- Observability and Tracing -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-brave</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-observation</artifactId>
-		</dependency>
+<!--		&lt;!&ndash; Observability and Tracing &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>io.micrometer</groupId>-->
+<!--			<artifactId>micrometer-tracing-bridge-brave</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>io.micrometer</groupId>-->
+<!--			<artifactId>micrometer-observation</artifactId>-->
+<!--		</dependency>-->
 
 		<!-- Tests -->
 		<dependency>
@@ -103,6 +109,11 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Testcontainers -->
