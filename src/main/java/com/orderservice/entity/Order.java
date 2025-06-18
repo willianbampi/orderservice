@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order")
+@Table(name = "tb_order")
 @Getter
 @Setter
 @NoArgsConstructor
