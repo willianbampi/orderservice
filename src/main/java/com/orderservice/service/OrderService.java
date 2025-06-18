@@ -5,7 +5,7 @@ import com.orderservice.entity.Order;
 import com.orderservice.entity.OrderItem;
 import com.orderservice.entity.Partner;
 import com.orderservice.event.OrderStatusEventPublisher;
-import com.orderservice.exception.InsuficientCreditException;
+import com.orderservice.exception.InsufficientCreditException;
 import com.orderservice.exception.OrderNotFoundException;
 import com.orderservice.exception.PartnerNotFoundException;
 import com.orderservice.repository.OrderItemRepository;
@@ -37,7 +37,7 @@ public class OrderService {
         BigDecimal totalAmount = getTotalAmount(dto.items());
 
         if (partner.getCreditLimit().compareTo(totalAmount) < 0) {
-            throw new InsuficientCreditException("Partner does not have sufficient credit!");
+            throw new InsufficientCreditException("Partner does not have sufficient credit!");
         }
 
         Order order = Order.builder()
@@ -86,13 +86,13 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found!"));
 
-        Order.OrderStatus previousStaus = order.getStatus();
+        Order.OrderStatus previousStatus = order.getStatus();
         order.setStatus(dto.status());
         order = orderRepository.save(order);
 
-        if (previousStaus == Order.OrderStatus.PENDENTE &&
+        if (previousStatus == Order.OrderStatus.PENDENTE &&
                 dto.status() == Order.OrderStatus.APROVADO) {
-            creditChange(order, "decrement");
+            creditChange(order, "sub");
         }
 
         eventPublisher.publishStatusChange(order);
@@ -108,7 +108,7 @@ public class OrderService {
         order.setStatus(Order.OrderStatus.CANCELADO);
         orderRepository.save(order);
 
-        creditChange(order, "increment");
+        creditChange(order, "add");
 
         eventPublisher.publishStatusChange(order);
     }
@@ -117,11 +117,11 @@ public class OrderService {
         Partner partner = partnerRepository.findById(order.getPartnerId())
                 .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
 
-        if ("decrement".equals(operation) && partner.getCreditLimit().compareTo(order.getTotalAmount()) < 0) {
-            throw new InsuficientCreditException("Insuficiente credit to approve the order!");
+        if ("sub".equals(operation) && partner.getCreditLimit().compareTo(order.getTotalAmount()) < 0) {
+            throw new InsufficientCreditException("Insufficient credit to approve the order!");
         }
 
-        if("decrement".equals(operation)) {
+        if("sub".equals(operation)) {
             partner.setCreditLimit(partner.getCreditLimit().subtract(order.getTotalAmount()));
         } else {
             partner.setCreditLimit(partner.getCreditLimit().add(order.getTotalAmount()));
