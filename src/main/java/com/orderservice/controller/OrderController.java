@@ -54,8 +54,8 @@ public class OrderController implements GenericController {
     @Operation(summary = "Get an order by period")
     @GetMapping("/period")
     public ResponseEntity<List<OrderResponseDTO>> getByPeriod(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end
+            @RequestParam LocalDateTime start,
+            @RequestParam LocalDateTime end
     ) {
         log.info("ORDERCONTROLLER - getByPeriod method with start: {} and with end: {}", start, end);
         return ResponseEntity.ok(orderService.getByPeriod(start, end));
