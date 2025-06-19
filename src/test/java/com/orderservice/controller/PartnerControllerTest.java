@@ -3,7 +3,6 @@ package com.orderservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orderservice.dto.PartnerRequestDTO;
 import com.orderservice.dto.PartnerResponseDTO;
-import com.orderservice.entity.Partner;
 import com.orderservice.exception.GlobalExceptionHandler;
 import com.orderservice.exception.PartnerNotFoundException;
 import com.orderservice.service.PartnerService;
@@ -18,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -30,10 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(PartnerController.class)
 public class PartnerControllerTest {
 
-    private static final UUID partnerId = UUID.randomUUID();
-    private static final Partner partner = new Partner(partnerId, "Partner A", new BigDecimal("1000.00"),
-                                                       LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(),
-                                                       LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+    private static final UUID PARTNER_ID = UUID.randomUUID();
+    private static final String PARTNER_A_NAME = "Partner A";
+    private static final String PARTNER_UPDATE_NAME = "Partner Update";
+    private static final String PARTNER_NOT_FOUND = "Partner not found!";
+    private static final BigDecimal CREDIT_LIMIT_INITIAL = new BigDecimal("1000.00");
+    private static final BigDecimal CREDIT_LIMIT_UPDATED = new BigDecimal("2000.00");
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,8 +56,8 @@ public class PartnerControllerTest {
 
     @Test
     void createPartner_shouldReturnCreated() throws Exception {
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner A", new BigDecimal("1000"));
-        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(partnerId, "Partner A", new BigDecimal("1000"));
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_A_NAME, CREDIT_LIMIT_INITIAL);
+        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(PARTNER_ID, PARTNER_A_NAME, CREDIT_LIMIT_INITIAL);
 
         when(partnerService.create(any())).thenReturn(partnerResponseDTO);
 
@@ -70,57 +69,57 @@ public class PartnerControllerTest {
 
     @Test
     void getPartnerById_shouldReturnPartner() throws Exception {
-        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(partnerId, "Partner A", new BigDecimal("1000"));
+        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(PARTNER_ID, PARTNER_A_NAME, CREDIT_LIMIT_INITIAL);
 
         when(partnerService.getById(any())).thenReturn(partnerResponseDTO);
 
-        mockMvc.perform(get("/api/partners/{id}", partnerId))
+        mockMvc.perform(get("/api/partners/{id}", PARTNER_ID))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.id").value(partnerId.toString()))
-               .andExpect(jsonPath("$.name").value("Partner A"))
+               .andExpect(jsonPath("$.id").value(PARTNER_ID.toString()))
+               .andExpect(jsonPath("$.name").value(PARTNER_A_NAME))
                .andExpect(jsonPath("$.creditLimit").value(1000.00));
     }
 
     @Test
     void getPartnerById_shouldReturnExceptionWhenNotFound() throws Exception {
         UUID anotherPartnerId = UUID.randomUUID();
-        when(partnerService.getById(any())).thenThrow(new PartnerNotFoundException("Partner not found!"));
+        when(partnerService.getById(any())).thenThrow(new PartnerNotFoundException(PARTNER_NOT_FOUND));
 
         mockMvc.perform(get("/api/partners/{id}", anotherPartnerId))
                .andExpect(status().isNotFound())
                .andExpect(jsonPath("$.status").value(404))
-               .andExpect(jsonPath("$.message").value("Partner not found!"));
+               .andExpect(jsonPath("$.message").value(PARTNER_NOT_FOUND));
     }
 
     @Test
     void updatePartner_shouldReturnPartner() throws Exception {
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner Update", new BigDecimal("2000"));
-        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(partnerId, "Partner A", new BigDecimal("1000"));
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_UPDATE_NAME, CREDIT_LIMIT_UPDATED);
+        PartnerResponseDTO partnerResponseDTO = new PartnerResponseDTO(PARTNER_ID, PARTNER_A_NAME, CREDIT_LIMIT_INITIAL);
 
         when(partnerService.update(any(), any())).thenReturn(partnerResponseDTO);
 
-        mockMvc.perform(post("/api/partners/{id}", partnerId)
+        mockMvc.perform(post("/api/partners/{id}", PARTNER_ID)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(partnerRequestDTO)))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.id").value(partnerId.toString()))
-               .andExpect(jsonPath("$.name").value("Partner A"))
+               .andExpect(jsonPath("$.id").value(PARTNER_ID.toString()))
+               .andExpect(jsonPath("$.name").value(PARTNER_A_NAME))
                .andExpect(jsonPath("$.creditLimit").value(1000.00));
     }
 
     @Test
     void updatePartner_shouldReturnExceptionWhenNotFound() throws Exception {
         UUID anotherPartnerId = UUID.randomUUID();
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner Update", new BigDecimal("2000"));
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_UPDATE_NAME, CREDIT_LIMIT_UPDATED);
 
-        when(partnerService.update(any(), any())).thenThrow(new PartnerNotFoundException("Partner not found!"));
+        when(partnerService.update(any(), any())).thenThrow(new PartnerNotFoundException(PARTNER_NOT_FOUND));
 
         mockMvc.perform(post("/api/partners/{id}", anotherPartnerId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(partnerRequestDTO)))
                .andExpect(status().isNotFound())
                .andExpect(jsonPath("$.status").value(404))
-               .andExpect(jsonPath("$.message").value("Partner not found!"));
+               .andExpect(jsonPath("$.message").value(PARTNER_NOT_FOUND));
     }
 
 }

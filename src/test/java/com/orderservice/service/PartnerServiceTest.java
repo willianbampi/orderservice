@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Optional;
@@ -20,8 +19,13 @@ import static org.mockito.Mockito.*;
 
 public class PartnerServiceTest {
 
-    private static final UUID partnerId = UUID.randomUUID();
-    private static final Partner partner = new Partner(partnerId, "Partner A", new BigDecimal("1000.00"),
+    private static final UUID PARTNER_ID = UUID.randomUUID();
+    private static final String PARTNER_A_NAME = "Partner A";
+    private static final String PARTNER_UPDATE_NAME = "Partner Update";
+    private static final String PARTNER_NOT_FOUND = "Partner not found!";
+    private static final BigDecimal CREDIT_LIMIT_INITIAL = new BigDecimal("1000.00");
+    private static final BigDecimal CREDIT_LIMIT_UPDATED = new BigDecimal("2000.00");
+    private static final Partner PARTNER = new Partner(PARTNER_ID, PARTNER_A_NAME, CREDIT_LIMIT_INITIAL,
                                                        LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay(),
                                                        LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
 
@@ -39,17 +43,17 @@ public class PartnerServiceTest {
     @Test
     void creatPartner_shouldReturnPartnerCreated() {
         // Arrange
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner A", new BigDecimal("1000"));
-        when(partnerRepository.save(any(Partner.class))).thenReturn(partner);
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_A_NAME, CREDIT_LIMIT_INITIAL);
+        when(partnerRepository.save(any(Partner.class))).thenReturn(PARTNER);
 
         // Act
         PartnerResponseDTO partnerResponseDTO = partnerService.create(partnerRequestDTO);
 
         // Assert
         assertNotNull(partnerResponseDTO);
-        assertEquals(partnerId, partnerResponseDTO.id());
-        assertEquals("Partner A", partnerResponseDTO.name());
-        assertEquals(new BigDecimal("1000.00"), partnerResponseDTO.creditLimit());
+        assertEquals(PARTNER_ID, partnerResponseDTO.id());
+        assertEquals(PARTNER_A_NAME, partnerResponseDTO.name());
+        assertEquals(CREDIT_LIMIT_INITIAL, partnerResponseDTO.creditLimit());
 
         verify(partnerRepository, times(1)).save(any(Partner.class));
     }
@@ -57,17 +61,17 @@ public class PartnerServiceTest {
     @Test
     void getPartnerById_shouldReturnPartnerWhenExist() {
         // Arrange
-        when(partnerRepository.findById(partnerId)).thenReturn(Optional.of(partner));
+        when(partnerRepository.findById(PARTNER_ID)).thenReturn(Optional.of(PARTNER));
 
         // Act
-        PartnerResponseDTO partnerResponseDTO = partnerService.getById(partnerId);
+        PartnerResponseDTO partnerResponseDTO = partnerService.getById(PARTNER_ID);
 
         // Assert
         assertNotNull(partnerResponseDTO);
-        assertEquals(partnerId, partnerResponseDTO.id());
-        assertEquals("Partner A", partnerResponseDTO.name());
+        assertEquals(PARTNER_ID, partnerResponseDTO.id());
+        assertEquals(PARTNER_A_NAME, partnerResponseDTO.name());
 
-        verify(partnerRepository, times(1)).findById(partnerId);
+        verify(partnerRepository, times(1)).findById(PARTNER_ID);
     }
 
     @Test
@@ -80,7 +84,7 @@ public class PartnerServiceTest {
         PartnerNotFoundException partnerNotFoundException = assertThrows(PartnerNotFoundException.class, () ->
                 partnerService.getById(anotherPartnerId)
         );
-        assertEquals("Partner not found!", partnerNotFoundException.getMessage());
+        assertEquals(PARTNER_NOT_FOUND, partnerNotFoundException.getMessage());
 
         verify(partnerRepository, times(1)).findById(anotherPartnerId);
     }
@@ -88,39 +92,39 @@ public class PartnerServiceTest {
     @Test
     void updatePartner_shouldUpdate() {
         // Arrange
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner Update", new BigDecimal("2000"));
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_UPDATE_NAME, CREDIT_LIMIT_UPDATED);
 
-        when(partnerRepository.findById(partnerId)).thenReturn(Optional.of(partner));
+        when(partnerRepository.findById(PARTNER_ID)).thenReturn(Optional.of(PARTNER));
         when(partnerRepository.save(any(Partner.class))).thenAnswer(i -> i.getArgument(0));
 
         // Act
-        PartnerResponseDTO partnerResponseDTO = partnerService.update(partnerId, partnerRequestDTO);
+        PartnerResponseDTO partnerResponseDTO = partnerService.update(PARTNER_ID, partnerRequestDTO);
 
         // Assert
         assertNotNull(partnerResponseDTO);
-        assertEquals(partnerId, partnerResponseDTO.id());
-        assertEquals("Partner Update", partnerResponseDTO.name());
-        assertEquals(new BigDecimal("2000"), partnerResponseDTO.creditLimit());
+        assertEquals(PARTNER_ID, partnerResponseDTO.id());
+        assertEquals(PARTNER_UPDATE_NAME, partnerResponseDTO.name());
+        assertEquals(CREDIT_LIMIT_UPDATED, partnerResponseDTO.creditLimit());
 
-        verify(partnerRepository, times(1)).findById(partnerId);
+        verify(partnerRepository, times(1)).findById(PARTNER_ID);
         verify(partnerRepository, times(1)).save(any(Partner.class));
     }
 
     @Test
     void updatePartner_shouldThrowsExceptionWhenNotFound() {
         // Arrange
-        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO("Partner Update", new BigDecimal("2000"));
+        PartnerRequestDTO partnerRequestDTO = new PartnerRequestDTO(PARTNER_UPDATE_NAME, CREDIT_LIMIT_UPDATED);
 
-        when(partnerRepository.findById(partnerId)).thenReturn(Optional.empty());
+        when(partnerRepository.findById(PARTNER_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         PartnerNotFoundException partnerNotFoundException = assertThrows(PartnerNotFoundException.class, () ->
-                partnerService.update(partnerId, partnerRequestDTO)
+                partnerService.update(PARTNER_ID, partnerRequestDTO)
         );
 
-        assertEquals("Partner not found!", partnerNotFoundException.getMessage());
+        assertEquals(PARTNER_NOT_FOUND, partnerNotFoundException.getMessage());
 
-        verify(partnerRepository, times(1)).findById(partnerId);
+        verify(partnerRepository, times(1)).findById(PARTNER_ID);
         verify(partnerRepository, never()).save(any(Partner.class));
     }
 

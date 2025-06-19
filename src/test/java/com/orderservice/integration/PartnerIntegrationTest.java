@@ -2,7 +2,6 @@ package com.orderservice.integration;
 
 import com.orderservice.entity.Partner;
 import com.orderservice.repository.PartnerRepository;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Testcontainers
 public class PartnerIntegrationTest {
+
+    private static final String PARTNER_A_NAME = "Partner A";
+    private static final String PARTNER_B_NAME = "Partner B";
+    private static final String PARTNER_UPDATE_NAME = "Partner Update";
+    private static final BigDecimal CREDIT_LIMIT_INITIAL = new BigDecimal("1000.00");
+    private static final BigDecimal CREDIT_LIMIT_UPDATED = new BigDecimal("2000.00");
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16.3")
@@ -44,8 +49,8 @@ public class PartnerIntegrationTest {
     @BeforeEach
     void setup() {
         partner = Partner.builder()
-                                 .name("Partner A")
-                                 .creditLimit(new BigDecimal("1000.00"))
+                                 .name(PARTNER_A_NAME)
+                                 .creditLimit(CREDIT_LIMIT_INITIAL)
                                  .build();
         partner = partnerRepository.save(partner);
     }
@@ -53,15 +58,15 @@ public class PartnerIntegrationTest {
     @Test
     void shouldCreatPartener() {
         Partner newPartner = Partner.builder()
-                                 .name("Partner B")
-                                 .creditLimit(new BigDecimal("2000.00"))
+                                 .name(PARTNER_B_NAME)
+                                 .creditLimit(CREDIT_LIMIT_UPDATED)
                                  .build();
 
         Partner savedNewPartner = partnerRepository.save(newPartner);
 
         assertNotNull(savedNewPartner.getId());
-        assertEquals("Partner B", savedNewPartner.getName());
-        assertEquals(new BigDecimal("2000.00"), savedNewPartner.getCreditLimit());
+        assertEquals(PARTNER_B_NAME, savedNewPartner.getName());
+        assertEquals(CREDIT_LIMIT_UPDATED, savedNewPartner.getCreditLimit());
     }
 
     @Test
@@ -70,8 +75,8 @@ public class PartnerIntegrationTest {
 
         assertTrue(searchedPartner.isPresent());
         assertEquals(partner.getId(), searchedPartner.get().getId());
-        assertEquals("Partner A", searchedPartner.get().getName());
-        assertEquals(new BigDecimal("1000.00"), searchedPartner.get().getCreditLimit());
+        assertEquals(PARTNER_A_NAME, searchedPartner.get().getName());
+        assertEquals(CREDIT_LIMIT_INITIAL, searchedPartner.get().getCreditLimit());
     }
 
     @Test
@@ -83,16 +88,16 @@ public class PartnerIntegrationTest {
 
     @Test
     void shouldUpdatePartner() {
-        partner.setName("Partner Update");
-        partner.setCreditLimit(new BigDecimal("2000.00"));
+        partner.setName(PARTNER_UPDATE_NAME);
+        partner.setCreditLimit(CREDIT_LIMIT_UPDATED);
 
         Partner updatedPartner = partnerRepository.save(partner);
 
         Optional<Partner> searchedAfterUpdatedPartner = partnerRepository.findById(updatedPartner.getId());
 
         assertTrue(searchedAfterUpdatedPartner.isPresent());
-        assertEquals("Partner Update", searchedAfterUpdatedPartner.get().getName());
-        assertEquals(new BigDecimal("2000.00"), searchedAfterUpdatedPartner.get().getCreditLimit());
+        assertEquals(PARTNER_UPDATE_NAME, searchedAfterUpdatedPartner.get().getName());
+        assertEquals(CREDIT_LIMIT_UPDATED, searchedAfterUpdatedPartner.get().getCreditLimit());
     }
 
 //    @Test
