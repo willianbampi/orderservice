@@ -42,8 +42,10 @@ public class PartnerService {
     }
 
     public PartnerResponseDTO update(UUID id, PartnerRequestDTO dto) {
+        Partner searchedPartner = partnerRepository.findById(id)
+                                           .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
         Partner partner = Partner.builder()
-                .id(id)
+                .id(searchedPartner.getId())
                 .name(dto.name())
                 .creditLimit(dto.creditLimit())
                 .build();
