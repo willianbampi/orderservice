@@ -29,10 +29,10 @@ public class PartnerControllerTest {
 
     private static final UUID PARTNER_ID = UUID.randomUUID();
     private static final String PARTNER_A_NAME = "Partner A";
-    private static final String PARTNER_UPDATE_NAME = "Partner Update";
-    private static final String PARTNER_NOT_FOUND = "Partner not found!";
     private static final BigDecimal CREDIT_LIMIT_INITIAL = new BigDecimal("1000.00");
     private static final BigDecimal CREDIT_LIMIT_UPDATED = new BigDecimal("2000.00");
+    private static final String PARTNER_UPDATE_NAME = "Partner Update";
+    private static final String PARTNER_NOT_FOUND = "Partner not found!";
 
     @Autowired
     private MockMvc mockMvc;
