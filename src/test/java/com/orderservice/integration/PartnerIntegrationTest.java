@@ -2,6 +2,7 @@ package com.orderservice.integration;
 
 import com.orderservice.entity.Partner;
 import com.orderservice.repository.PartnerRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,11 @@ public class PartnerIntegrationTest {
         partner = partnerRepository.save(partner);
     }
 
+    @AfterEach
+    void tearDown() {
+        partnerRepository.deleteAll();
+    }
+
     @Test
     void shouldCreatPartener() {
         Partner newPartner = Partner.builder()
@@ -100,20 +106,22 @@ public class PartnerIntegrationTest {
         assertEquals(CREDIT_LIMIT_UPDATED, searchedAfterUpdatedPartner.get().getCreditLimit());
     }
 
-//    @Test
-//    void updateNotPresentPartnerShouldCreateNew() {
-//        UUID newPartnerId = UUID.randomUUID();
-//        Partner notPresentePartner = Partner.builder()
-//                                            .id(newPartnerId)
-//                                            .name("Partner Already Not Present")
-//                                            .creditLimit(new BigDecimal("5000.00"))
-//                                            .build();
-//
-//        Partner savedNotPresentePartner = partnerRepository.save(notPresentePartner);
-//
-//        assertNotNull(savedNotPresentePartner.getId());
-//        assertNotEquals(newPartnerId, savedNotPresentePartner.getId());
-//        assertEquals("Partner Already Not Present", savedNotPresentePartner.getName());
-//    }
+    /** TODO improve this test case
+    @Test
+    void updateNotPresentPartnerShouldCreateNew() {
+        UUID newPartnerId = UUID.randomUUID();
+        Partner notPresentePartner = Partner.builder()
+                                            .id(newPartnerId)
+                                            .name("Partner Already Not Present")
+                                            .creditLimit(new BigDecimal("5000.00"))
+                                            .build();
+
+        Partner savedNotPresentePartner = partnerRepository.save(notPresentePartner);
+
+        assertNotNull(savedNotPresentePartner.getId());
+        assertNotEquals(newPartnerId, savedNotPresentePartner.getId());
+        assertEquals("Partner Already Not Present", savedNotPresentePartner.getName());
+    }
+    */
 
 }
