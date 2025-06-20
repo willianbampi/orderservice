@@ -12,10 +12,12 @@ import static com.orderservice.configuration.RabbitMQConfig.ORDER_STATUS_QUEUE;
 @RequiredArgsConstructor
 public class OrderStatusEventPublisher {
 
+    private static final String SEND_ORDER_STATUS_LOG_INFO = "Sending order status event: {}";
+
     private final RabbitTemplate rabbitTemplate;
 
     public void publishStatusChange(OrderStatusEvent event) {
-        log.info("Sending order status event: {}", event);
+        log.info(SEND_ORDER_STATUS_LOG_INFO, event);
         rabbitTemplate.convertAndSend(ORDER_STATUS_QUEUE, event);
     }
 

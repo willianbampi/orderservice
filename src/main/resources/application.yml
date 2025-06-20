@@ -32,6 +32,9 @@ spring:
     port: 5672
     username: rabbituser
     password: rabbitpass
+    listener:
+      simple:
+        acknowledge-mode: auto
 
 logging:
   level:
