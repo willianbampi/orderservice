@@ -24,6 +24,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private static final String PARTNER_NOT_FOUND = "Partner not found!";
+    private static final String PARTNER_INSUFICIENT_CREDIT = "Partner does not have sufficient credit!";
+    private static final String ORDER_NOT_FOUND = "Order not found!";
+    private static final String ADD = "add";
+    private static final String SUB = "sub";
+    private static final int ZERO = 0;
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final PartnerRepository partnerRepository;
@@ -32,12 +39,12 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO dto) {
         Partner partner = partnerRepository.findById(dto.partnerId())
-                .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
+                .orElseThrow(() -> new PartnerNotFoundException(PARTNER_NOT_FOUND));
 
         BigDecimal totalAmount = getTotalAmount(dto.items());
 
-        if (partner.getCreditLimit().compareTo(totalAmount) < 0) {
-            throw new InsufficientCreditException("Partner does not have sufficient credit!");
+        if (partner.getCreditLimit().compareTo(totalAmount) < ZERO) {
+            throw new InsufficientCreditException(PARTNER_INSUFICIENT_CREDIT);
         }
 
         Order order = Order.builder()
@@ -65,7 +72,7 @@ public class OrderService {
 
     public OrderResponseDTO getById(UUID id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found!"));
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
         return toResponseDTO(order);
     }
 
@@ -84,15 +91,16 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO updateStatus(UUID id, OrderStatusUpdateRequestDTO dto) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found!"));
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
         Order.OrderStatus previousStatus = order.getStatus();
         order.setStatus(dto.status());
         order = orderRepository.save(order);
 
+        //TODO create a logical flow for order status doesn't return
         if (previousStatus == Order.OrderStatus.PENDENTE &&
                 dto.status() == Order.OrderStatus.APROVADO) {
-            creditChange(order, "sub");
+            creditChange(order, SUB);
         }
 
         eventPublisher.publishStatusChange(order);
@@ -103,25 +111,26 @@ public class OrderService {
     @Transactional
     public void orderCancel(UUID id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found!"));
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
+        //TODO verify if order already canceled before change status
         order.setStatus(Order.OrderStatus.CANCELADO);
         orderRepository.save(order);
 
-        creditChange(order, "add");
+        creditChange(order, ADD);
 
         eventPublisher.publishStatusChange(order);
     }
 
     private void creditChange(Order order, String operation) {
         Partner partner = partnerRepository.findById(order.getPartnerId())
-                .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
+                .orElseThrow(() -> new PartnerNotFoundException(PARTNER_NOT_FOUND));
 
-        if ("sub".equals(operation) && partner.getCreditLimit().compareTo(order.getTotalAmount()) < 0) {
-            throw new InsufficientCreditException("Insufficient credit to approve the order!");
+        if (SUB.equals(operation) && partner.getCreditLimit().compareTo(order.getTotalAmount()) < ZERO) {
+            throw new InsufficientCreditException(PARTNER_INSUFICIENT_CREDIT);
         }
 
-        if("sub".equals(operation)) {
+        if(SUB.equals(operation)) {
             partner.setCreditLimit(partner.getCreditLimit().subtract(order.getTotalAmount()));
         } else {
             partner.setCreditLimit(partner.getCreditLimit().add(order.getTotalAmount()));

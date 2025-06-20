@@ -16,13 +16,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PartnerService {
 
+    private static final String PARTNER_NOT_FOUND = "Partner not found!";
+    private static final String PARTNER_ALREADY_EXISTS = "Partner already exists!";
+
     private final PartnerRepository partnerRepository;
 
     public PartnerResponseDTO create(PartnerRequestDTO dto) {
 
         Optional<Partner> searchedPartner = partnerRepository.findByName(dto.name());
         if(searchedPartner.isPresent()) {
-            throw new AlreadyExistsException("Partner already exists!");
+            throw new AlreadyExistsException(PARTNER_ALREADY_EXISTS);
         }
 
         Partner partner = Partner.builder()
@@ -37,13 +40,13 @@ public class PartnerService {
 
     public PartnerResponseDTO getById(UUID id) {
         Partner partner = partnerRepository.findById(id)
-                .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
+                .orElseThrow(() -> new PartnerNotFoundException(PARTNER_NOT_FOUND));
         return toResponseDTO(partner);
     }
 
     public PartnerResponseDTO update(UUID id, PartnerRequestDTO dto) {
         Partner searchedPartner = partnerRepository.findById(id)
-                                           .orElseThrow(() -> new PartnerNotFoundException("Partner not found!"));
+                                           .orElseThrow(() -> new PartnerNotFoundException(PARTNER_NOT_FOUND));
         Partner partner = Partner.builder()
                 .id(searchedPartner.getId())
                 .name(dto.name())

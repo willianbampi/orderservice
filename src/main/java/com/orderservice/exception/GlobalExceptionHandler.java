@@ -19,6 +19,12 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String VALIDATION_FAILED = "Validation failed";
+    private static final String VALIDATION_ERROR_LOG = "Validation error: {}";
+    private static final String UNEXPECTED_ERROR_LOG = "Unexpected error";
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error";
+    private static final String HANDLED_ERROR_LOG = "Handled error: {}";
+
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ApiError> handleOrderNotFoundException(OrderNotFoundException ex, HttpServletRequest request) {
         return buildResponseEntity(NOT_FOUND, ex.getMessage(), request);
@@ -48,22 +54,20 @@ public class GlobalExceptionHandler {
                         .build())
                 .collect(Collectors.toList());
 
-        ApiError apiError = buildApiError(BAD_REQUEST, "Validation failed", request, fieldErrors);
-
-        log.warn("Validation error: {}", apiError);
-
+        ApiError apiError = buildApiError(BAD_REQUEST, VALIDATION_FAILED, request, fieldErrors);
+        log.warn(VALIDATION_ERROR_LOG, apiError);
         return new ResponseEntity<>(apiError, BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleAllUnhandled(Exception ex, HttpServletRequest request) {
-        log.error("Unexpected error", ex);
-        return buildResponseEntity(INTERNAL_SERVER_ERROR, "Internal server error", request);
+        log.error(UNEXPECTED_ERROR_LOG, ex);
+        return buildResponseEntity(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE, request);
     }
 
     private ResponseEntity<ApiError> buildResponseEntity(HttpStatus status, String message, HttpServletRequest request) {
         ApiError apiError = buildApiError(status, message, request, null);
-        log.warn("Handled error: {}", apiError);
+        log.warn(HANDLED_ERROR_LOG, apiError);
         return new ResponseEntity<>(apiError, status);
     }
 
